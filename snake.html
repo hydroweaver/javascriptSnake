@@ -10,16 +10,25 @@
         canv = document.getElementById("gc");
         context = canv.getContext("2d");
         document.addEventListener("keydown", keyPush);
-        setInterval(game, 1000/15);
+        setInterval(game, 1000/10);
     }
 
     XPlayer = YPlayer = 10;
-    gridSize = tileCount = 400;
+    gridSize = tileCount = 20;
     appleX = appleY = 15;
     xVelocity = yVelocity = 0;
+    snakeLength = 5;
+    trail = [];
 
     function game() {
 
+        drawBackground();
+
+        trail.push([XPlayer, YPlayer]);
+        if(trail.length > snakeLength){
+            trail.shift();
+        }
+        
         XPlayer += xVelocity;YPlayer += yVelocity;
 
         if(XPlayer < 0){
@@ -37,41 +46,60 @@
         if(YPlayer > tileCount - 1){
             YPlayer = 0;
         }
+        
+        context.fillStyle = "red";
+        context.fillRect(appleX*gridSize, appleY*gridSize, gridSize-2, gridSize-2);
+        
+        for(var i = 0; i < snakeLength; i++){
+            context.fillStyle = "lime";
+            context.fillRect(trail[i][0]*gridSize, trail[i][1]*gridSize, gridSize-2, gridSize-2);
+            if(snakeLength > 5 && XPlayer == trail[i][0] && YPlayer == trail[i][1]){
+                snakeLength = 5;
+                alert('GAME OVER');
+                XPlayer = YPlayer = 10;
+            }
+        }
 
-        drawRect(XPlayer, YPlayer);
-
+        if(XPlayer == appleX && YPlayer == appleY){
+            snakeLength += 1;
+            appleX = Math.floor(Math.random()*tileCount);
+            appleY = Math.floor(Math.random()*tileCount);
+        }
+        
     }
 
-    function drawRect(x, y){
+    function displayApple(){
+        context.fillStyle = "black";
+    }
+
+    function drawBackground(){
         context.fillStyle = "black";
         context.fillRect(0, 0, canv.width, canv.height);
-        context.fillStyle = "green";
-        context.fillRect(x, y, 10, 10);
     }
 
     function keyPush(event) {
         switch(event.keyCode){
             case 37:
-                xVelocity = -10;
+                xVelocity = -1;
                 yVelocity = 0;
                 console.log('Player Position: ', XPlayer, YPlayer);
                 console.log('Velocity: ', xVelocity, yVelocity);
                 break;
             case 38:
                 xVelocity = 0;
-                yVelocity = -10;
+                yVelocity = -1;
                 console.log('Player Position: ', XPlayer, YPlayer);
                 console.log('Velocity: ', xVelocity, yVelocity);
                 break;
             case 39:
-                xVelocity = 10;
+                xVelocity = 1;
                 yVelocity = 0;
                 console.log('Player Position: ', XPlayer, YPlayer);
                 console.log('Velocity: ', xVelocity, yVelocity);
                 break;
             case 40:
                 xVelocity = 0;
-                yVelocity = 10;
+                yVelocity = 1;
                 console.log('Player Position: ', XPlayer, YPlayer);
                 console.log('Velocity: ', xVelocity, yVelocity);
                 break; 
